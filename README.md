@@ -10,6 +10,7 @@ The datasets used for the projects are:
   ![mnist-m](/src/results/dataset_samples/mnistm.png)
 - SYNTH: contains synthetically generated images of digits.
   ![synth](/src/results/dataset_samples/synth.png)
+  
 All the dataset used are in the folder original_dataset_files, instead working_dataset_files is used to save the results obtained from Resnet-38 (used as a checkpoint).
 
 This allows us to perform a performance comparison between 36 different types of configuration, combining:
@@ -19,7 +20,7 @@ This allows us to perform a performance comparison between 36 different types of
 - 3x Datasets (SVHN, MNIST-M and SYNTH)
 
 ## Install
-Install the python libraries dependencies inside the` src/requirements.txt` file.
+Install the python libraries dependencies inside the `src/requirements.txt` file.
 
 Execute `main.py`.
 
