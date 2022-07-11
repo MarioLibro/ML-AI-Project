@@ -11,10 +11,10 @@ The datasets used for the projects are:
 - SYNTH: contains synthetically generated images of digits.
   ![synth](/src/results/dataset_samples/synth.png)
   
-All the dataset used are in the folder original_dataset_files, instead working_dataset_files is used to save the results obtained from Resnet-38 (used as a checkpoint).
+All the dataset used are in the folder original_dataset_files, instead working_dataset_files is used to save the results obtained from Resnet-34 (used as a checkpoint).
 
 This allows us to perform a performance comparison between 36 different types of configuration, combining:
-- 1x Features extractor (Resnet-38)
+- 1x Features extractor (Resnet-34)
 - 2x Features reductor (LDA and PCA)
 - 2x Classifers (SVM and KNN)
 - 3x Datasets (SVHN, MNIST-M and SYNTH)
@@ -30,7 +30,7 @@ It will automatically:
 - Load datasets (class balanced with 500 samples per class)
 - Data preprocessing 
 - Training/Testing set split (80/20)
-- Feature extraction with Resnet-38
+- Feature extraction with Resnet-34
 - Feature Normalization
 - Classification using 36 different types of configurations
 - Save results
