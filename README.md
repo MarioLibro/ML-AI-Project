@@ -32,7 +32,7 @@ It will automatically:
 - Training/Testing set split (80/20)
 - Feature extraction with Resnet-38
 - Feature Normalization
-- Classificaiton using 36 different types of configurations
+- Classification using 36 different types of configurations
 - Save results
 
 ## Results
