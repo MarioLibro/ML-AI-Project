@@ -48,5 +48,6 @@ After the execution of main.py all the results are saved in `src/results`. In pa
 - `src/results/results_dict.csv`: contains evaluation metrics (accuracy, precision, recall) for all the 36 different types of configuration.
 
 The results that we obtained are available in `./results`.
+A detailed report is available in the folder `./report`, where we analyze the obtained results.
 ## Authors
 @MarioLibro and @FilippoNevi
