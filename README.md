@@ -23,7 +23,7 @@ We performed a performance comparison between 72 different types of configuratio
 ## Install
 - Install the python libraries dependencies inside the `src/requirements.txt` file.
 
-- [Download](https://univr-my.sharepoint.com/:u:/g/personal/mario_libro_studenti_univr_it/EUHynMY2nOdFqryAH4PSDcsB0aonD6z6F1q_uKDwyF7x1Q?e=U9YJD1) and unzip `datasets.zip` in `src/data/original_dataset_files`.
+- [Download](https://drive.google.com/file/d/1_MBIettKKF_RMmrWpeJJfSD3e3qUnHtI/view?usp=sharing) and unzip `datasets.zip` in `src/data/original_dataset_files`.
 
 - Execute `src/main.py`.
 
