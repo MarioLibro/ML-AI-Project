@@ -11,30 +11,44 @@ import time
 import json
 import torch
 
+#VERBOSE -> show plots and print
 VERBOSE = False
-#save train/test features and labels
+
 def checkpoint(feature_train, feature_test, y_train, y_test, dataset_name):
+    """
+    Save extracted features
+    """
+
     np.save('data/working_dataset_files/'+ dataset_name +'_feature_train.npy', feature_train)
     np.save('data/working_dataset_files/'+ dataset_name +'_y_train.npy', y_train)
     np.save('data/working_dataset_files/'+ dataset_name +'_feature_test.npy', feature_test)
     np.save('data/working_dataset_files/'+ dataset_name +'_y_test.npy', y_test)
 
-#load train/test features and labels
 def load_checkpoint(dataset_name):
+    """
+    Load checkpoint (pre-extracted features)
+    """
+
     feature_train = np.load('data/working_dataset_files/'+ dataset_name +'_feature_train.npy')
     y_train = np.load('data/working_dataset_files/'+ dataset_name +'_y_train.npy')
     feature_test = np.load('data/working_dataset_files/'+ dataset_name +'_feature_test.npy')
     y_test = np.load('data/working_dataset_files/'+ dataset_name +'_y_test.npy')
+
     return feature_train, feature_test, y_train, y_test
 
 def classification(pipe, x_train, x_test, y_train, y_test, step):
+    """
+    Classification phase, save confusion matrix
+    """
+
     start_time = time.time()
+
     pipe.fit(x_train, y_train)
     y_predicted = pipe.predict(x_test)
     misclassified_idx = np.where(y_test!=y_predicted)[0]
 
     # Display confusion matrix using sklearn
-    conf_mat = ConfusionMatrixDisplay.from_predictions( y_test, y_predicted)
+    ConfusionMatrixDisplay.from_predictions( y_test, y_predicted)
     plt.xlabel('Predicted label', fontweight = 'bold', fontsize = 15)
     plt.ylabel('Real label', fontweight ='bold', fontsize = 15)
     plt.title(step, fontweight ='bold', fontsize = 15)
@@ -44,31 +58,35 @@ def classification(pipe, x_train, x_test, y_train, y_test, step):
     if VERBOSE:
         plt.show()
     plt.close()
-
     
-    # Calculate the accuracy, precision and recall (of the whole classifier)
-    # Hint: in sklearn, when dealing with multiclass problems, you need to specify the type of 
-    # averaging for the precision and recall metrics. What we did before can be simulated with 
-    # average='macro'.
+    # Calculate the accuracy, precision, recall (of the whole classifier) and elapsed time
     accuracy = accuracy_score(y_test, y_predicted)
-    precision = precision_score(y_test, y_predicted, average='macro') #macro -> means of mean;
-    recall = recall_score(y_test, y_predicted, average = 'macro')
-    
-    #print('{0:.2f}'.format(time.time() - start_time),'s')
-    return accuracy*100, precision, recall, misclassified_idx, y_predicted
+    precision = precision_score(y_test, y_predicted, average='macro') #macro -> means of mean
+    recall = recall_score(y_test, y_predicted, average = 'macro') #macro -> means of mean
+    elapsed_time = round(time.time() - start_time,2)
 
-def print_classifier_performance(accuracy, precision, recall):
-    print('Accuracy: ' + '{0:.2f}'.format(accuracy) + '%' 
+    return accuracy*100, precision, recall, misclassified_idx, y_predicted, elapsed_time
+
+def print_classifier_performance(accuracy, precision, recall, elapsed_time):
+    """
+    Print classifier performances
+    """
+
+    print('\t\tAccuracy: ' + '{0:.2f}'.format(accuracy) + '%' 
           + '; Precision: ' + '{0:.2f}'.format(precision)
-          + '; Recall: ' + '{0:.2f}'.format(recall) +'\n')
+          + '; Recall: ' + '{0:.2f}'.format(recall)
+          + '; Time: ' + '{0:.2f}'.format(elapsed_time) +'s')
 
 def pca_n_components(variance, feature):
-    RAND_STATE = 0 
+    """
+    Retrieve n_components to reach a specif variance with PCA
+    """
+
     pca = PCA(n_components=variance)
     pca.fit(feature)
 
     if VERBOSE:
-        # Plot the explained variance ratio in a cumulative fashion, in order to visualize the cumulative variance plot
+        # Plot the explained variance ratio
         plt.plot(range(1,len(pca.explained_variance_ratio_)+1), pca.explained_variance_ratio_.cumsum(), marker='o', linestyle='--')
         plt.title('Explained variance by number of components')
         plt.ylabel('Cumulative explained variance')
@@ -79,8 +97,11 @@ def pca_n_components(variance, feature):
     
     return n_components
 
-def show_misclassified(x_test, y_test, misclassified_idx, y_predicted, step):
-    # Show 9 random images in the train dataset
+def save_misclassified_samples(x_test, y_test, misclassified_idx, y_predicted, step):
+    """
+    Save/Show 20 random misclassified samples with predicted value and ground truth
+    """
+
     figure = plt.figure(figsize=(8,8))
     figure.suptitle(step, fontweight ='bold', fontsize = 15)
     cols, rows = 5, 4
@@ -96,8 +117,8 @@ def show_misclassified(x_test, y_test, misclassified_idx, y_predicted, step):
         img = img_invTransforms(img)
         img = torch.permute(img, (1,2,0))
         figure.add_subplot(rows, cols, i)
-        plt.title(f'pred:{y_predicted[sample_idx]} ' 
-                    f'gt:{y_test[sample_idx]}') 
+        plt.title(f'pred:{y_predicted[sample_idx]}' 
+                    f' gt:{y_test[sample_idx]}') 
         plt.axis('off')
  
         plt.imshow(img)
@@ -109,15 +130,20 @@ def show_misclassified(x_test, y_test, misclassified_idx, y_predicted, step):
     plt.close()
 
 def plot_results(results = None):
+    """
+    Save/Show multiple bar plot (accuracy performance of each classifier combination)
+    """
+
+    #for debugging
     if(results is None):
         results = json.load(open('results/results_dict.json','r'))
         
     df = pd.DataFrame(results)
     
-    # set width of bar
     barWidth = 0.2
     fig = plt.subplots(figsize =(18, 8))
-    
+
+    # --- Dataframe preprocessing ---
     df['reductor_classifier'] = df['reductor'] + '_' + df['classifier']
     df['source_target'] = df['source'] + '_' + df['target']
     df.drop(['reductor', 'classifier',  'source', 'target'], inplace=True, axis=1)
@@ -125,6 +151,7 @@ def plot_results(results = None):
     print(df)
     df.to_csv('results/results_dict.csv', index = False, header=True, sep=';')
     df.drop(['precision', 'recall'], inplace=True, axis=1)
+    # -----------------
     
     sources_targets = [
         'svhn_svhn',
@@ -144,11 +171,6 @@ def plot_results(results = None):
         'pca_knn',
         'lda_knn',
     ]
-
-    #accuracies_source_target = []
-    #for source_target in sources_targets:
-    #    accuracy = df.loc[(df['reductor_classifier'] == source_target), 'accuracy'].tolist()
-    #    accuracies_source_target.append(accuracy)
 
     pca_svm = df.loc[(df['reductor_classifier'] == 'pca_svm'), 'accuracy'].tolist()
     lda_svm = df.loc[(df['reductor_classifier'] == 'lda_svm'), 'accuracy'].tolist()
